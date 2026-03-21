@@ -42,3 +42,16 @@ POST /review — Submit code for review
 GET /history — Retrieve past reviews
 
 ---
+
+## Live Demo
+- Frontend: https://code-review-ai-f1se.onrender.com
+- Backend API: https://code-review-ai-b.onrender.com
+
+## Deployment
+- Backend hosted on Render (Python web service)
+- Frontend hosted on Render (Node web service)
+- Set OPENAI_API_KEY as an environment variable on Render
+
+## Limitations
+- Review history is session-based and resets on server restart
+- Rate limited to 10 requests per minute per IP
