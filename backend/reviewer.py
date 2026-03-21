@@ -14,13 +14,22 @@ Return ONLY valid JSON. No markdown, no explanation outside the JSON.
 """
 
 def review_code(code: str) -> dict:
-    response = client.chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"Review this code:\n\n{code}"}
-        ],
-        response_format={"type": "json_object"}
-    )
-    import json
-    return json.loads(response.choices[0].message.content)
+    try:
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": f"Review this code:\n\n{code}"}
+            ],
+            response_format={"type": "json_object"}
+        )
+        import json
+        return json.loads(response.choices[0].message.content)
+    except Exception as e:
+        return {
+            "bugs": [],
+            "security": [],
+            "performance": [],
+            "refactored_code": "",
+            "error": f"Review failed: {str(e)}"
+        }
