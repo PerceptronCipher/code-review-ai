@@ -2,15 +2,18 @@ from fastapi import FastAPI, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional
 from reviewer import review_code
+from datetime import datetime
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+history = []
 
 @app.post("/review")
 async def review(
@@ -25,4 +28,15 @@ async def review(
         return {"error": "No code provided"}
     
     result = review_code(code)
+    
+    history.append({
+        "timestamp": datetime.now().isoformat(),
+        "code_snippet": code[:100],
+        "result": result
+    })
+    
     return result
+
+@app.get("/history")
+async def get_history():
+    return history
