@@ -14,9 +14,11 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://code-review-ai-f1se.onrender.com"],
+    allow_origins=["http://localhost:3000", "https://code-review-ai-frontend-tcy4.onrender.com"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 
 history = []
