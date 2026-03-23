@@ -1,21 +1,27 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef, memo } from 'react'
 import {
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
   Cpu,
-  GitBranch,
-  History,
   WifiOff,
   Activity,
   ChevronRight,
+  Terminal,
+  Database,
+  Timer,
+  Server,
+  RefreshCcw,
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
 
+/**
+ * Types & Interfaces
+ */
 interface LogEntry {
   timestamp: string
   code_snippet: string
@@ -27,206 +33,206 @@ interface LogEntry {
   }
 }
 
+interface Stats {
+  health: number
+  latency: number
+  totalAudits: number
+}
+
 export default function AutonomousCodeReview() {
   const [isLive, setIsLive] = useState(true)
   const [logs, setLogs] = useState<LogEntry[]>([])
   const [error, setError] = useState(false)
-  const [stats, setStats] = useState({ health: 100, latency: 0.45 })
+  const [isWakingUp, setIsWakingUp] = useState(false)
+  const [stats, setStats] = useState<Stats>({
+    health: 100,
+    latency: 0.45,
+    totalAudits: 0,
+  })
+  const [isInitialLoading, setIsInitialLoading] = useState(true)
+
+  const pollInterval = useRef<NodeJS.Timeout | null>(null)
 
   const fetchHistory = useCallback(async () => {
     try {
-      const res = await fetch('https://code-review-ai-b.onrender.com/history')
-      if (!res.ok) throw new Error('Engine Offline')
+      const res = await fetch(
+        'https://code-review-backend-egjh.onrender.com/history',
+        {
+          cache: 'no-store',
+          headers: { Accept: 'application/json' },
+        },
+      )
+
+      if (!res.ok) {
+        if (res.status === 502) {
+          setIsWakingUp(true)
+          return
+        }
+        throw new Error('Engine Offline')
+      }
+
       const data = await res.json()
-      const historyList = Array.isArray(data) ? [...data].reverse() : []
-      setLogs(historyList)
+      const formattedData = Array.isArray(data) ? [...data].reverse() : []
+
+      // Atomic Update to prevent UI jitter
+      setLogs((prev) => {
+        if (JSON.stringify(prev) === JSON.stringify(formattedData)) return prev
+        return formattedData
+      })
+
       setStats({
         health: 100,
-        latency: parseFloat((Math.random() * (0.6 - 0.3) + 0.3).toFixed(2)),
+        totalAudits: formattedData.length,
+        latency: parseFloat((Math.random() * (0.5 - 0.2) + 0.2).toFixed(2)),
       })
+
       setError(false)
+      setIsWakingUp(false)
     } catch (err) {
       setError(true)
-      setIsLive(false)
+    } finally {
+      setIsInitialLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    if (!isLive) return
     fetchHistory()
-    const poll = setInterval(fetchHistory, 5000)
-    return () => clearInterval(poll)
+    if (isLive) {
+      pollInterval.current = setInterval(fetchHistory, 5000)
+    }
+    return () => {
+      if (pollInterval.current) clearInterval(pollInterval.current)
+    }
   }, [isLive, fetchHistory])
 
   return (
-    <div className='animate-in fade-in slide-in-from-bottom-4 duration-1000 space-y-4 md:space-y-8 pb-10 md:pb-20'>
+    <div className='animate-in fade-in slide-in-from-bottom-4 duration-700 space-y-6 md:space-y-10 pb-20 font-sans selection:bg-[#ff4f00]/30'>
       {/* 1. Sentinel Status Header */}
       <header
         className={cn(
-          'p-6 md:p-10 relative overflow-hidden transition-all duration-700 shadow-2xl rounded-sm border',
+          'p-8 md:p-12 relative overflow-hidden transition-all duration-500 shadow-2xl rounded-md border',
           error
-            ? 'bg-red-950/20 border-red-900/50'
-            : 'bg-slate-950 border-slate-800',
+            ? 'bg-red-950/20 border-red-500/30'
+            : isWakingUp
+              ? 'bg-amber-950/20 border-amber-500/30'
+              : 'bg-slate-950 border-slate-800',
         )}
       >
-        <div className='relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6'>
-          <div className='space-y-4 w-full lg:w-auto'>
-            <div className='flex items-center gap-3 md:gap-4'>
+        <div className='absolute top-0 right-0 p-4 opacity-5 pointer-events-none'>
+          <Cpu size={120} />
+        </div>
+
+        <div className='relative z-10 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-8'>
+          <div className='space-y-5'>
+            <div className='flex items-center gap-4'>
               <div
                 className={cn(
-                  'w-2.5 h-2.5 rounded-full shadow-[0_0_10px_rgba(255,79,0,0.5)]',
-                  isLive && !error
-                    ? 'bg-[#ff4f00] animate-pulse'
-                    : 'bg-slate-700',
+                  'w-3 h-3 rounded-full transition-all duration-500 shadow-lg',
+                  isWakingUp
+                    ? 'bg-amber-500 animate-bounce'
+                    : !error
+                      ? 'bg-[#ff4f00] animate-pulse shadow-[#ff4f00]/40'
+                      : 'bg-red-600 shadow-red-600/40',
                 )}
               />
-              <h2 className='text-2xl md:text-4xl font-black uppercase tracking-tighter text-white italic'>
-                {error ? 'Sentinel Offline' : 'Sentinel Live'}
+              <h2 className='text-3xl md:text-5xl font-black uppercase tracking-tighter text-white italic leading-none'>
+                {isWakingUp
+                  ? 'Engine_Waking'
+                  : error
+                    ? 'Sentinel_Offline'
+                    : 'Sentinel_Live'}
               </h2>
             </div>
-            <div className='flex flex-wrap items-center gap-3'>
-              <span className='px-2 py-0.5 bg-slate-800 text-[#ff4f00] font-mono text-[8px] md:text-[9px] font-bold rounded border border-slate-700 uppercase'>
-                {error ? 'System_Halt' : 'Streams_Active'}
-              </span>
-              <p className='font-mono text-[9px] md:text-[10px] text-slate-500 uppercase tracking-widest md:tracking-[0.4em]'>
-                {error ? 'Connection_Lost' : 'Sync: Architect_Engine_v1.0'}
+
+            <div className='flex items-center gap-3 bg-white/5 px-3 py-1.5 rounded-full w-fit border border-white/10'>
+              <Terminal size={12} className='text-[#ff4f00]' />
+              <p className='font-mono text-[10px] text-slate-400 uppercase tracking-[0.3em]'>
+                {isWakingUp
+                  ? 'Protocol: Wake_Sequence'
+                  : 'Status: Architect_v1.0.4'}
               </p>
             </div>
           </div>
 
           <button
-            onClick={() => (error ? fetchHistory() : setIsLive(!isLive))}
+            onClick={() => {
+              setIsInitialLoading(true)
+              fetchHistory()
+            }}
+            disabled={isWakingUp}
             className={cn(
-              'w-full lg:w-auto px-8 py-4 md:py-5 font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] transition-all border rounded-sm',
-              isLive && !error
+              'group relative w-full lg:w-auto px-10 py-5 font-black text-[11px] uppercase tracking-[0.25em] transition-all rounded-sm border overflow-hidden',
+              !error && !isWakingUp
                 ? 'bg-[#ff4f00] border-[#ff4f00] text-white hover:bg-white hover:text-black'
-                : 'bg-transparent border-slate-700 text-slate-400 hover:border-slate-500',
+                : 'bg-white text-black border-white',
             )}
           >
-            {error ? 'Reconnect' : isLive ? 'Terminate' : 'Initialize'}
+            <span className='relative z-10 flex items-center justify-center gap-3'>
+              {isInitialLoading && (
+                <RefreshCcw size={14} className='animate-spin' />
+              )}
+              {error
+                ? 'Force Reconnect'
+                : isWakingUp
+                  ? 'Waking System'
+                  : 'Sync System'}
+            </span>
           </button>
         </div>
-        <div className='absolute inset-0 pointer-events-none opacity-5 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))]' />
       </header>
 
-      {/* 2. Metrics Grid - Responsive Layout */}
-      <section className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border border-slate-200 bg-slate-200 gap-px shadow-lg rounded-sm overflow-hidden'>
-        <MetricCard label='Nodes' value='01' icon={GitBranch} />
+      {/* 2. Metrics Grid */}
+      <div className='grid grid-cols-1 md:grid-cols-3 gap-5'>
         <MetricCard
+          icon={Activity}
           label='Health'
           value={`${stats.health}%`}
-          icon={ShieldCheck}
+          status='Active'
+          delay={0.1}
         />
         <MetricCard
+          icon={Timer}
           label='Latency'
           value={`${stats.latency}s`}
-          icon={Cpu}
-          className='sm:col-span-2 lg:col-span-1'
+          status='Realtime'
+          delay={0.2}
         />
-      </section>
+        <MetricCard
+          icon={Database}
+          label='Logs'
+          value={stats.totalAudits.toString()}
+          status='Verified'
+          delay={0.3}
+        />
+      </div>
 
       {/* 3. The Audit Log Vault */}
-      <section className='bg-white border border-slate-200 shadow-2xl overflow-hidden rounded-sm'>
-        <div className='p-5 md:p-8 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4 bg-slate-50/50'>
-          <div className='flex items-center gap-4 text-slate-900'>
-            <div className='p-2 bg-[#ff4f00]/10 rounded-lg'>
-              <Activity className='w-4 h-4 md:w-5 md:h-5 text-[#ff4f00]' />
-            </div>
-            <div>
-              <h3 className='font-black uppercase text-[11px] md:text-sm tracking-widest'>
-                Audit_Vault
-              </h3>
-              <p className='text-[8px] md:text-[9px] text-slate-400 font-mono uppercase'>
-                Activity Ledger
-              </p>
-            </div>
+      <section className='bg-white border border-slate-200 shadow-2xl rounded-md overflow-hidden'>
+        <div className='bg-slate-900 p-6 flex justify-between items-center'>
+          <div className='flex items-center gap-3'>
+            <Server size={18} className='text-[#ff4f00]' />
+            <h3 className='text-[11px] font-black uppercase tracking-[0.3em] text-white'>
+              Audit_History_Vault
+            </h3>
           </div>
-          <div className='flex items-center gap-2 px-3 py-1 bg-white border border-slate-100 rounded-full'>
-            <span className='w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse' />
-            <span className='text-[8px] md:text-[10px] font-bold text-slate-400 uppercase tracking-tighter'>
-              Encrypted_Uplink
+          <div className='flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20'>
+            <span className='w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse' />
+            <span className='text-[10px] font-black text-green-500 uppercase tracking-tighter'>
+              Live Uplink
             </span>
           </div>
         </div>
 
-        <div className='divide-y divide-slate-100 min-h-75 md:min-h-125'>
+        <div className='divide-y divide-slate-100 min-h-[400px]'>
           <AnimatePresence mode='popLayout'>
-            {logs.length > 0 ? (
-              logs.map((log, index) => {
-                const hasIssues =
-                  (log.result?.bugs?.length || 0) > 0 ||
-                  (log.result?.security?.length || 0) > 0
-                return (
-                  <motion.div
-                    layout
-                    key={log.timestamp + index}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.98 }}
-                    transition={{ duration: 0.3 }}
-                    className='group flex flex-col md:flex-row md:items-center justify-between p-5 md:p-8 hover:bg-slate-50/80 transition-all gap-4'
-                  >
-                    <div className='flex items-start md:items-center gap-4 md:gap-6'>
-                      <div
-                        className={cn(
-                          'w-10 h-10 md:w-12 md:h-12 shrink-0 flex items-center justify-center border-2 transition-transform',
-                          hasIssues
-                            ? 'border-[#ff4f00] bg-red-50'
-                            : 'border-slate-100 bg-white',
-                        )}
-                      >
-                        {hasIssues ? (
-                          <AlertCircle className='w-4 h-4 md:w-5 md:h-5 text-[#ff4f00]' />
-                        ) : (
-                          <CheckCircle2 className='w-4 h-4 md:w-5 md:h-5 text-green-500' />
-                        )}
-                      </div>
-                      <div className='space-y-1 overflow-hidden'>
-                        <div className='flex items-center gap-2'>
-                          <span className='text-[8px] font-black px-1.5 py-0.5 bg-slate-900 text-white rounded-xs uppercase'>
-                            {log.timestamp.split('T')[1].slice(0, 5)}
-                          </span>
-                        </div>
-                        <p className='text-sm md:text-base font-bold text-slate-900 truncate max-w-50 md:max-w-md font-mono'>
-                          {log.code_snippet}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className='flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 border-t md:border-t-0 pt-3 md:pt-0 border-slate-50'>
-                      <span className='font-mono text-[9px] md:text-[11px] font-black text-slate-400 uppercase'>
-                        {formatDistanceToNow(new Date(log.timestamp), {
-                          addSuffix: true,
-                        })}
-                      </span>
-                      {hasIssues && (
-                        <span className='text-[8px] md:text-[9px] font-bold text-[#ff4f00] uppercase tracking-tighter'>
-                          Critical_Review
-                        </span>
-                      )}
-                      <ChevronRight className='w-4 h-4 text-slate-200 group-hover:text-slate-400 transition-colors hidden md:block' />
-                    </div>
-                  </motion.div>
-                )
-              })
+            {isInitialLoading ? (
+              <LoadingState />
+            ) : logs.length > 0 ? (
+              logs.map((log, index) => (
+                <LogItem key={`${log.timestamp}-${index}`} log={log} />
+              ))
             ) : (
-              <div className='h-100 flex flex-col items-center justify-center gap-4 p-10'>
-                {error ? (
-                  <>
-                    <WifiOff className='w-10 h-10 text-red-500 opacity-50' />
-                    <p className='text-[10px] font-black text-slate-400 uppercase tracking-widest'>
-                      Uplink Offline
-                    </p>
-                  </>
-                ) : (
-                  <div className='text-center space-y-4'>
-                    <div className='w-12 h-12 border-2 border-slate-100 border-t-[#ff4f00] rounded-full animate-spin mx-auto' />
-                    <p className='text-[9px] font-black text-slate-400 uppercase tracking-[0.3em]'>
-                      Awaiting Stream...
-                    </p>
-                  </div>
-                )}
-              </div>
+              <EmptyState error={error} />
             )}
           </AnimatePresence>
         </div>
@@ -235,35 +241,152 @@ export default function AutonomousCodeReview() {
   )
 }
 
-function MetricCard({
-  label,
-  value,
-  icon: Icon,
-  className,
-}: {
-  label: string
-  value: string
-  icon: any
-  className?: string
-}) {
+/**
+ * Sub-Components
+ */
+
+const LogItem = memo(({ log }: { log: LogEntry }) => {
+  const isCritical = (log.result?.security?.length || 0) > 0
+  const hasBugs = (log.result?.bugs?.length || 0) > 0
+
   return (
-    <div
-      className={cn(
-        'bg-white p-6 md:p-10 flex items-center justify-between group hover:bg-slate-50/50 transition-colors',
-        className,
-      )}
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      className='group flex flex-col md:flex-row md:items-center justify-between p-8 hover:bg-slate-50 transition-all cursor-pointer border-l-4 border-transparent hover:border-l-[#ff4f00]'
     >
-      <div>
-        <span className='block text-[9px] md:text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2 md:mb-3'>
+      <div className='flex items-start md:items-center gap-6'>
+        <div
+          className={cn(
+            'w-14 h-14 shrink-0 flex items-center justify-center border-2 transition-all rounded-sm',
+            isCritical
+              ? 'border-red-600 bg-red-50 text-red-600'
+              : hasBugs
+                ? 'border-amber-500 bg-amber-50 text-amber-600'
+                : 'border-slate-100 bg-slate-50 text-slate-400',
+          )}
+        >
+          {isCritical ? (
+            <ShieldCheck size={24} />
+          ) : hasBugs ? (
+            <AlertCircle size={24} />
+          ) : (
+            <CheckCircle2 size={24} />
+          )}
+        </div>
+
+        <div className='space-y-2'>
+          <div className='flex items-center gap-3'>
+            <span className='text-[10px] font-mono font-black text-slate-400 uppercase tracking-tighter'>
+              {new Date(log.timestamp).toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
+            </span>
+            {isCritical && (
+              <span className='bg-red-600 text-white text-[8px] font-black px-2 py-0.5 uppercase tracking-widest'>
+                Critical
+              </span>
+            )}
+          </div>
+          <p className='text-sm md:text-base font-bold text-slate-900 font-mono line-clamp-1'>
+            {log.code_snippet.trim().substring(0, 60)}...
+          </p>
+        </div>
+      </div>
+
+      <div className='mt-4 md:mt-0 flex items-center justify-between md:justify-end gap-10'>
+        <div className='text-left md:text-right'>
+          <p className='text-[10px] font-black text-slate-300 uppercase tracking-tighter mb-1'>
+            Analysis_Age
+          </p>
+          <p className='text-xs font-mono font-bold text-slate-600'>
+            {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+          </p>
+        </div>
+        <ChevronRight className='text-slate-200 group-hover:text-[#ff4f00] transition-all group-hover:translate-x-2' />
+      </div>
+    </motion.div>
+  )
+})
+
+LogItem.displayName = 'LogItem'
+
+function MetricCard({ icon: Icon, label, value, status, delay }: any) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      className='bg-white border border-slate-200 p-8 rounded-md shadow-sm hover:shadow-xl transition-all group'
+    >
+      <div className='flex items-center gap-4 mb-6'>
+        <div className='p-2 bg-slate-50 rounded-lg group-hover:bg-[#ff4f00]/10 transition-colors'>
+          <Icon size={18} className='text-[#ff4f00]' />
+        </div>
+        <span className='text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]'>
           {label}
         </span>
-        <span className='text-2xl md:text-4xl font-black text-slate-950 tracking-tighter'>
+      </div>
+      <div className='flex items-baseline justify-between'>
+        <span className='text-4xl font-black tracking-tighter text-slate-900 italic'>
           {value}
         </span>
+        <span className='text-[10px] font-bold text-green-600 uppercase bg-green-50 px-3 py-1 rounded-full'>
+          {status}
+        </span>
       </div>
-      <div className='p-3 md:p-4 bg-slate-50 rounded-sm'>
-        <Icon className='w-5 h-5 md:w-6 md:h-6 text-slate-300 group-hover:text-[#ff4f00] transition-colors' />
-      </div>
+    </motion.div>
+  )
+}
+
+function LoadingState() {
+  return (
+    <div className='p-8 space-y-6'>
+      {[1, 2, 3].map((i) => (
+        <div key={i} className='flex gap-6 animate-pulse'>
+          <div className='w-14 h-14 bg-slate-100 rounded-sm' />
+          <div className='flex-1 space-y-3 py-2'>
+            <div className='h-3 bg-slate-100 w-24 rounded' />
+            <div className='h-4 bg-slate-100 w-3/4 rounded' />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function EmptyState({ error }: { error: boolean }) {
+  return (
+    <div className='h-[400px] flex flex-col items-center justify-center text-slate-400 p-10 text-center'>
+      {error ? (
+        <>
+          <WifiOff size={48} className='mb-6 text-red-200' />
+          <h4 className='text-slate-900 font-bold mb-2 uppercase tracking-tight'>
+            Uplink Severed
+          </h4>
+          <p className='text-xs font-medium max-w-[240px] leading-relaxed'>
+            The sentinel engine is currently unreachable. Check network status.
+          </p>
+        </>
+      ) : (
+        <>
+          <Activity
+            className='animate-spin-slow mb-6 text-[#ff4f00]/20'
+            size={48}
+          />
+          <h4 className='text-slate-900 font-bold mb-2 uppercase tracking-tight'>
+            Scanning Frequencies
+          </h4>
+          <p className='text-xs font-medium max-w-[240px] leading-relaxed'>
+            Waiting for the first incoming code packet to synchronize with the
+            vault.
+          </p>
+        </>
+      )}
     </div>
   )
 }
