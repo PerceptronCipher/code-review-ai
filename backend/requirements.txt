@@ -3,3 +3,4 @@ uvicorn
 slowapi
 openai
 python-dotenv
+python-multipart
