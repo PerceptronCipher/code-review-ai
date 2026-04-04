@@ -22,10 +22,18 @@ function Paste() {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:8000/review", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://code-review-ai-sw33.onrender.com/review",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to review code");
+      }
+
       const data = await response.json();
       setReview(data);
     } catch (err) {
