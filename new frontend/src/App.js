@@ -5,6 +5,7 @@ import HeroPage from "./Pages/HeroPage";
 import Paste from "./Pages/Paste";
 import Cards from "./Pages/Cards";
 import Footer from "./Pages/Footer";
+import Features from "./Pages/Features";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
         <HeroPage />
         <Paste />
         <Cards />
+        <Features />
         <Footer />
       </div>
     </div>
