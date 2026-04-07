@@ -4,8 +4,8 @@ import Navbar from "./Pages/Navbar";
 import HeroPage from "./Pages/HeroPage";
 import Paste from "./Pages/Paste";
 import Cards from "./Pages/Cards";
-import Footer from "./Pages/Footer";
 import Features from "./Pages/Features";
+import Footer from "./Pages/Footer";
 
 function App() {
   return (
