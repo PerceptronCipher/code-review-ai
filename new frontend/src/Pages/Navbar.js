@@ -7,7 +7,7 @@ function Navbar() {
         <img src={q} />
       </div>
       <div className="nav-links">
-        <a href="#features">Features</a>
+        <a href="#how-it-works">Features</a>
 
         <a href="#hero">Docs</a>
         <a href="#contact">Privacy</a>
