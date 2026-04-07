@@ -66,7 +66,7 @@ function Paste() {
       <div className="language-options" style={{ marginBottom: "20px" }}>
         <p style={{ marginBottom: "10px" }}>Language</p>
         <div className="lang-buttons">
-          {["English"].map((lang) => (
+          {["English", "Spanish", "French", "German"].map((lang) => (
             <button
               key={lang}
               onClick={() => setLanguage(lang)}
