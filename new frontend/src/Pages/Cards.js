@@ -3,7 +3,7 @@ function Cards() {
     <div className="cards" id="features">
       <div className="card">
         <h2>Issues Detected</h2>
-        <li>⚠️ Unused Variable</li>
+        <li>Unused Variable</li>
         <p> Variable declared but never used in the code.</p>
         <li>Possible Null Reference</li>
         <p> Object may be null before being accessed.</p>
