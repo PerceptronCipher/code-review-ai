@@ -1,3 +1,4 @@
+//code-review-ai/src/Pages/Paste.js
 import { useState } from "react";
 
 function Paste() {
