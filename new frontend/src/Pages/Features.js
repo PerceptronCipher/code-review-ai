@@ -1,6 +1,6 @@
 import star from "../images/Star 1.png";
 
-function How() {
+function Features() {
   return (
     <div className="how" id="how-it-works">
       <div className="howHeading">Features</div>
@@ -35,4 +35,4 @@ function How() {
     </div>
   );
 }
-export default How;
+export default Features;
