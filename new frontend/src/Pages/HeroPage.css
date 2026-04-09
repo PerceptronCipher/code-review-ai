@@ -1,0 +1,103 @@
+.hero {
+  min-height: 80vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 120px 20px 60px;
+  text-align: center;
+  background-color: #ffffff; /* Clean white background */
+}
+
+.hero-content {
+  max-width: 900px;
+  width: 100%;
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem); /* Responsive font sizing */
+  font-weight: 800;
+  line-height: 1.1;
+  color: #1e293b;
+  margin-bottom: 24px;
+}
+
+.text-accent {
+  color: #3b82f6; /* Matching the blue from your navbar */
+}
+
+.hero p {
+  font-size: 1.1rem;
+  color: #64748b;
+  line-height: 1.6;
+  max-width: 650px;
+  margin: 0 auto 40px;
+  font-weight: 500;
+}
+
+.hero-btn-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Primary Button (Upload Docs) */
+.btn-primary {
+  background-color: #3b82f6;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: box-shadow 0.3s ease;
+}
+
+.btn-primary a {
+  color: white;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.25);
+}
+
+/* Secondary Button (Start Review) */
+.btn-secondary {
+  background-color: white;
+  color: #1e293b;
+  border: 1.5px solid #e2e8f0;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+  .hero {
+    padding-top: 100px;
+  }
+  
+  .hero-btn-group {
+    flex-direction: column;
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+
+  .btn-primary, .btn-secondary {
+    width: 100%;
+  }
+
+  .desktop-br {
+    display: none;
+  }
+}
