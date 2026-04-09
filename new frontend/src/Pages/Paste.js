@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const BACKEND_URL = "https://code-review-ai-sw33.onrender.com";
+const BACKEND_URL = "https://api-code-review.buildoninc.org";
 
 function Paste() {
   const [code, setCode] = useState("");
