@@ -1,23 +1,24 @@
-
-import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Frame from "../images/Frame19.png";
 import Frame1 from "../images/Frame20.png";
 import Frame2 from "../images/Frame21.png";
-import {
-  faXTwitter
-} from '@fortawesome/free-brands-svg-icons'
-import './Footer.css'
 
 function Footer() {
   return (
     <div className="footer">
       <div className="footer1">
         <div>
-          <div className="ffree">minimals</div>
+          <div className="ffree">FreelancerAI</div>
           <div className="ffree1">the working AI proposal</div>
           <div className="ffree2">
-            <a><faXTwitter /></a>
+            <div>
+              <img src={Frame} alt="Frame" />
+            </div>
+            <div>
+              <img src={Frame1} alt="Frame" />
+            </div>
+            <div>
+              <img src={Frame2} alt="Frame" />
+            </div>
           </div>
         </div>
 
@@ -62,4 +63,3 @@ function Footer() {
 }
 
 export default Footer;
-

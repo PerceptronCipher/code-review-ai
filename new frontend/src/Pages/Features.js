@@ -1,5 +1,5 @@
 // import star from "../images/Star 1.png";
-
+ 
 // function Features() {
 //   const featuresList = [
 //     "Paste code directly into the editor for instant review",

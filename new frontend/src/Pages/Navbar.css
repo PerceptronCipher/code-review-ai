@@ -3,7 +3,7 @@
   top: 0;
   width: 100%;
   height: 80px;
-  background: #4F6084;
+  background: #4f6084;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -11,13 +11,16 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+.navbar-main {
+  display: flex;
+  padding: 20px;
+}
 .brand-logo {
   font-size: 2rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.5px;
 }
-
 
 .nav-container {
   width: 90%;
@@ -58,7 +61,7 @@
 
 .nav-links a:hover {
   color: #ffffff;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 /* Desktop Action - Right Aligned */
