@@ -11,6 +11,14 @@
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
+.brand-logo {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+
 .nav-container {
   width: 90%;
   max-width: 1400px; /* Increased for wider desktop layout */
