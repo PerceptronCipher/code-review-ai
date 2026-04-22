@@ -1,13 +1,10 @@
-
-import React from 'react'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Frame from "../images/Frame19.png";
 import Frame1 from "../images/Frame20.png";
 import Frame2 from "../images/Frame21.png";
-import {
-  faXTwitter
-} from '@fortawesome/free-brands-svg-icons'
-import './Footer.css'
+import { FaSquareXTwitter } from "react-icons/fa6";
+import "./Footer.css";
 
 function Footer() {
   return (
@@ -17,7 +14,9 @@ function Footer() {
           <div className="ffree">minimals</div>
           <div className="ffree1">the working AI proposal</div>
           <div className="ffree2">
-            <a><faXTwitter /></a>
+            <a href="https://x.com/0xmnimals?s=2">
+              <FaSquareXTwitter size={28} />
+            </a>
           </div>
         </div>
 
@@ -62,4 +61,3 @@ function Footer() {
 }
 
 export default Footer;
-
