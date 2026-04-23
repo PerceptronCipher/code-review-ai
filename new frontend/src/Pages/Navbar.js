@@ -4,7 +4,7 @@ function Navbar() {
   return (
     <div className="navbar">
       <div className="logo">
-        <img src={q} />
+        <h2>minimals</h2>
       </div>
       <div className="nav-links">
         <a href="#">Features</a>
