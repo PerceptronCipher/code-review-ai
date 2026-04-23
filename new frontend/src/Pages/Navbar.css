@@ -1,62 +1,44 @@
+/* =========================================
+   DESKTOP NAVBAR (Base Styles)
+   ========================================= */
 .navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
+  display: flex !important;
+  justify-content: space-between; /* Keeps logo left, menu right */
+  align-items: center; /* Vertically centers them */
+  padding: 0 5%;
   height: 80px;
   background: #4f6084;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
+  color: white;
+  position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.navbar-main {
-  display: flex;
-  padding: 20px;
-}
-.brand-logo {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #fff;
+.logo h2 {
+  margin: 0;
+  font-size: 1.8rem;
   letter-spacing: -0.5px;
-}
-
-.nav-container {
-  width: 90%;
-  max-width: 1400px; /* Increased for wider desktop layout */
-  display: flex;
-  justify-content: space-between; /* Spreads Logo, Links, and Button */
-  align-items: center;
-}
-
-.logo {
-  flex: 1; /* Gives the logo section space on the left */
-  font-size: 1.6rem;
   font-weight: 800;
-  color: #ffffff;
-  letter-spacing: -1px;
 }
 
-.logo-accent {
-  color: #3b82f6;
-}
-
-/* Desktop Links - Centered */
-.nav-links.desktop-only {
+.nav-content {
   display: flex;
-  list-style: none;
+  align-items: center;
   gap: 40px;
-  justify-content: center;
-  flex: 2; /* Ensures the links take up the middle space */
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
 }
 
 .nav-links a {
-  text-decoration: none;
   color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
   font-weight: 500;
+  font-size: 1rem;
   transition: all 0.3s ease;
-  font-size: 0.95rem;
 }
 
 .nav-links a:hover {
@@ -64,90 +46,131 @@
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
-/* Desktop Action - Right Aligned */
-.nav-action.desktop-only {
-  flex: 1;
-  display: flex;
-  justify-content: flex-end; /* Pushes button to the far right */
-}
-
-.upload-btn {
+.nav-btn button {
   background-color: #3b82f6;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.upload-btn a {
   color: white;
-  text-decoration: none;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
-.upload-btn:hover {
+.nav-btn button:hover {
   background-color: #2563eb;
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
-/* Hamburger UI */
+/* Hide Hamburger by default */
 .hamburger {
   display: none;
   flex-direction: column;
-  gap: 6px;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
   cursor: pointer;
-  z-index: 2001;
+  z-index: 100;
 }
 
-.bar {
-  width: 28px;
-  height: 2px;
-  background-color: #ffffff;
-  transition: 0.4s ease;
-}
-
-/* Mobile Menu */
-.nav-menu-mobile {
-  position: fixed;
-  top: 0;
-  right: 0;
+.hamburger .bar {
+  height: 3px;
   width: 100%;
-  height: 100vh;
-  background: #334155;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
+  background-color: white;
+  border-radius: 10px;
+  transition: all 0.3s ease;
 }
 
-.nav-links-mobile {
-  list-style: none;
-  padding: 0;
-  text-align: center;
-}
-
-.nav-links-mobile li {
-  margin: 25px 0;
-}
-
-.nav-links-mobile a {
-  font-size: 2rem;
-  color: white;
-  text-decoration: none;
-  font-weight: 800;
-}
-
-/* Responsive Logic */
-@media (max-width: 968px) {
-  .desktop-only {
-    display: none !important;
+/* =========================================
+   MOBILE NAVBAR (Responsive Styles)
+   ========================================= */
+@media (max-width: 768px) {
+  .navbar {
+    display: flex !important;
+    flex-direction: row !important; 
+    justify-content: space-between !important; 
+    align-items: center !important;
+    flex-wrap: nowrap !important; 
   }
+
+  .logo {
+    width: auto !important;
+    flex: 0 1 auto !important;
+    text-align: left !important;
+    margin: 0 !important;
+  }
+
+  
+  .hamburger {
+    display: flex;
+  }   
+
+  /* Show hamburger */
   .hamburger {
     display: flex;
   }
-  .logo {
-    flex: none; /* Reset flex for mobile alignment */
+
+  /* Hamburger to "X" Animation */
+  .hamburger.open .bar:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+  }
+  .hamburger.open .bar:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.open .bar:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+  }
+
+  /* Professional Mobile Dropdown */
+  .nav-content {
+    display: none; /* Hidden by default */
+    flex-direction: column;
+    position: absolute;
+    top: 80px; /* Starts exactly below the 80px navbar */
+    left: 0;
+    width: 100%;
+    background: #3c4b6b; /* Slightly darker shade for contrast */
+    padding: 20px 0 30px 0;
+    box-shadow: 0 15px 20px rgba(0, 0, 0, 0.2);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 999;
+  }
+
+  /* Display when 'show' class is added via React */
+  .nav-content.show {
+    display: flex;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    gap: 0; /* Removing gap to use padding on a-tags for better touch targets */
+  }
+
+  .nav-links a {
+    width: 100%;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .nav-links a:last-child {
+    border-bottom: none;
+  }
+
+  .nav-btn {
+    margin-top: 25px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-btn button {
+    width: 85%; /* Full width button on mobile looks much better */
+    padding: 14px;
+    font-size: 1.1rem;
   }
 }
