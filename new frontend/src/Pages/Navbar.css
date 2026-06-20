@@ -8,7 +8,7 @@
   padding: 0 5%;
   height: 80px;
   background: #f8fafc;
-  color: black;
+  color: #000000;
   position: relative;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   box-sizing: border-box;
@@ -34,7 +34,7 @@
 }
 
 .nav-links a {
-  color: rgba(255, 255, 255, 0.85);
+  color: #000000;
   text-decoration: none;
   font-weight: 500;
   font-size: 1rem;
@@ -43,7 +43,7 @@
 
 .nav-links a:hover {
   color: #ffffff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  text-shadow: 0 0 10px #000000;
 }
 
 .nav-btn button {
