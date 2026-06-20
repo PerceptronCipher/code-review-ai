@@ -11,10 +11,10 @@ function Footer() {
     <div className="footer">
       <div className="footer1">
         <div>
-          <div className="ffree">minimals</div>
+          <div className="ffree">Nexus AI</div>
           <div className="ffree1">the working AI proposal</div>
           <div className="ffree2">
-            <a href="https://x.com/0xminimals?s=2">
+            <a href="https://x.com/Nexuss_ai">
               <FaSquareXTwitter size={28} />
             </a>
           </div>
