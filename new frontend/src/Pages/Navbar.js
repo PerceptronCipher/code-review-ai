@@ -10,7 +10,7 @@ function Navbar() {
   return (
     <div className="navbar">
       <div className="logo">
-        <h2>minimals</h2>
+        <h2>Nexus AI</h2>
       </div>
       
       {/* Navigation Links and Button */}
